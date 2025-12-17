@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/protocolos/layout,_N_T_/protocolos/novo/layout,_N_T_/protocolos/novo/page,_N_T_/protocolos/novo"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/protocolos/novo/__PAGE__",
+    "/protocolos/novo",
+    "/protocolos",
+    "/_index",
+    "/_head"
+  ]
+}

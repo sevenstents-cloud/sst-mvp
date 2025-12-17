@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/planos/layout,_N_T_/planos/novo/layout,_N_T_/planos/novo/page,_N_T_/planos/novo"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/planos/novo/__PAGE__",
+    "/planos/novo",
+    "/planos",
+    "/_index",
+    "/_head"
+  ]
+}

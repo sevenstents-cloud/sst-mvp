@@ -1,0 +1,339 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/asos/[id]",
+      "regex": "^/asos/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/asos/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/cargos/[id]",
+      "regex": "^/cargos/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/cargos/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/documentos/[id]",
+      "regex": "^/documentos/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/documentos/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/empresas/[id]",
+      "regex": "^/empresas/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/empresas/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/exames/[id]",
+      "regex": "^/exames/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/exames/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/funcionarios/[id]",
+      "regex": "^/funcionarios/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/funcionarios/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/ghe/[id]",
+      "regex": "^/ghe/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/ghe/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/locais/[id]",
+      "regex": "^/locais/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/locais/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/planos/[id]",
+      "regex": "^/planos/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/planos/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/protocolos/[id]",
+      "regex": "^/protocolos/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/protocolos/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/riscos/[id]",
+      "regex": "^/riscos/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/riscos/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/setores/[id]",
+      "regex": "^/setores/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/setores/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin/users",
+      "regex": "^/admin/users(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/users(?:/)?$"
+    },
+    {
+      "page": "/api/admin/users",
+      "regex": "^/api/admin/users(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/users(?:/)?$"
+    },
+    {
+      "page": "/api/seed-user",
+      "regex": "^/api/seed\\-user(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/seed\\-user(?:/)?$"
+    },
+    {
+      "page": "/asos",
+      "regex": "^/asos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/asos(?:/)?$"
+    },
+    {
+      "page": "/asos/novo",
+      "regex": "^/asos/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/asos/novo(?:/)?$"
+    },
+    {
+      "page": "/cargos",
+      "regex": "^/cargos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/cargos(?:/)?$"
+    },
+    {
+      "page": "/cargos/novo",
+      "regex": "^/cargos/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/cargos/novo(?:/)?$"
+    },
+    {
+      "page": "/documentos",
+      "regex": "^/documentos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/documentos(?:/)?$"
+    },
+    {
+      "page": "/documentos/novo",
+      "regex": "^/documentos/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/documentos/novo(?:/)?$"
+    },
+    {
+      "page": "/empresas",
+      "regex": "^/empresas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/empresas(?:/)?$"
+    },
+    {
+      "page": "/empresas/novo",
+      "regex": "^/empresas/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/empresas/novo(?:/)?$"
+    },
+    {
+      "page": "/exames",
+      "regex": "^/exames(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/exames(?:/)?$"
+    },
+    {
+      "page": "/exames/novo",
+      "regex": "^/exames/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/exames/novo(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/funcionarios",
+      "regex": "^/funcionarios(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/funcionarios(?:/)?$"
+    },
+    {
+      "page": "/funcionarios/novo",
+      "regex": "^/funcionarios/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/funcionarios/novo(?:/)?$"
+    },
+    {
+      "page": "/ghe",
+      "regex": "^/ghe(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/ghe(?:/)?$"
+    },
+    {
+      "page": "/ghe/novo",
+      "regex": "^/ghe/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/ghe/novo(?:/)?$"
+    },
+    {
+      "page": "/locais",
+      "regex": "^/locais(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/locais(?:/)?$"
+    },
+    {
+      "page": "/locais/novo",
+      "regex": "^/locais/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/locais/novo(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/perfil",
+      "regex": "^/perfil(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/perfil(?:/)?$"
+    },
+    {
+      "page": "/planos",
+      "regex": "^/planos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/planos(?:/)?$"
+    },
+    {
+      "page": "/planos/novo",
+      "regex": "^/planos/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/planos/novo(?:/)?$"
+    },
+    {
+      "page": "/protocolos",
+      "regex": "^/protocolos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/protocolos(?:/)?$"
+    },
+    {
+      "page": "/protocolos/novo",
+      "regex": "^/protocolos/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/protocolos/novo(?:/)?$"
+    },
+    {
+      "page": "/riscos",
+      "regex": "^/riscos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/riscos(?:/)?$"
+    },
+    {
+      "page": "/riscos/novo",
+      "regex": "^/riscos/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/riscos/novo(?:/)?$"
+    },
+    {
+      "page": "/setores",
+      "regex": "^/setores(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/setores(?:/)?$"
+    },
+    {
+      "page": "/setores/novo",
+      "regex": "^/setores/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/setores/novo(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

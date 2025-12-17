@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/riscos/layout,_N_T_/riscos/novo/layout,_N_T_/riscos/novo/page,_N_T_/riscos/novo"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/riscos/novo/__PAGE__",
+    "/riscos/novo",
+    "/riscos",
+    "/_index",
+    "/_head"
+  ]
+}

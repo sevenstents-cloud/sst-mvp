@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/setores/layout,_N_T_/setores/novo/layout,_N_T_/setores/novo/page,_N_T_/setores/novo"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/setores/novo/__PAGE__",
+    "/setores/novo",
+    "/setores",
+    "/_index",
+    "/_head"
+  ]
+}

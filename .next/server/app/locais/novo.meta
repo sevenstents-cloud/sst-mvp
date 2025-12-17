@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/locais/layout,_N_T_/locais/novo/layout,_N_T_/locais/novo/page,_N_T_/locais/novo"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/locais/novo/__PAGE__",
+    "/locais/novo",
+    "/locais",
+    "/_index",
+    "/_head"
+  ]
+}
