@@ -1,0 +1,233 @@
+/* [project]/src/app/globals.css [app-client] (css) */
+:root {
+  --primary-h: 220;
+  --primary-s: 90%;
+  --primary-l: 56%;
+  --primary: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+  --primary-foreground: #fff;
+  --secondary-h: 150;
+  --secondary-s: 80%;
+  --secondary-l: 40%;
+  --secondary: hsl(var(--secondary-h), var(--secondary-s), var(--secondary-l));
+  --secondary-foreground: #fff;
+  --accent-h: 280;
+  --accent-s: 80%;
+  --accent-l: 60%;
+  --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+  --accent-foreground: #fff;
+  --destructive: #ef4343;
+  --destructive-foreground: #fff;
+  --background: #f8fafc;
+  --foreground: #0f1729;
+  --card: #fff;
+  --card-foreground: #0f1729;
+  --border: #e1e7ef;
+  --input: #e1e7ef;
+  --ring: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+  --radius: .75rem;
+  --glass-bg: #ffffffb3;
+  --glass-border: #ffffff80;
+  --glass-shadow: 0 8px 32px 0 #1f26871a;
+  --glass-blur: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #131520;
+    --foreground: #f8fafc;
+    --card: #171926;
+    --card-foreground: #f8fafc;
+    --border: #262a40;
+    --input: #262a40;
+    --glass-bg: #141928b3;
+    --glass-border: #ffffff14;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  line-height: 1.6;
+  transition: background-color .3s, color .3s;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h1 {
+  letter-spacing: -.02em;
+  font-size: 2.5rem;
+}
+
+h2 {
+  letter-spacing: -.01em;
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius);
+}
+
+.btn {
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: 1px solid #0000;
+  justify-content: center;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem 1rem;
+  font-size: .875rem;
+  font-weight: 600;
+  transition: all .2s cubic-bezier(.4, 0, .2, 1);
+  display: inline-flex;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: 0 4px 14px #3264ff4d;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px #3264ff66;
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.btn-secondary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-outline {
+  border-color: var(--border);
+  color: var(--foreground);
+  background: none;
+}
+
+.btn-outline:hover {
+  background: var(--input);
+}
+
+.btn-destructive {
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+.card {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px #0000000d;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  color: var(--foreground);
+  margin-bottom: .5rem;
+  font-size: .875rem;
+  font-weight: 500;
+  display: block;
+}
+
+.form-input, .form-select, .form-textarea {
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--background);
+  width: 100%;
+  color: var(--foreground);
+  padding: .75rem 1rem;
+  font-size: .95rem;
+  transition: all .2s;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-h), var(--primary-s), var(--primary-l), .15);
+  outline: none;
+}
+
+.table-container {
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: .9rem;
+}
+
+th {
+  text-align: left;
+  background: var(--input);
+  color: var(--foreground);
+  padding: 1rem;
+  font-weight: 600;
+}
+
+td {
+  border-top: 1px solid var(--border);
+  padding: 1rem;
+}
+
+tr:hover td {
+  background: #00000005;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: .4s ease-out forwards fadeIn;
+}
+
+/*# sourceMappingURL=src_app_globals_91e4631d.css.map*/
