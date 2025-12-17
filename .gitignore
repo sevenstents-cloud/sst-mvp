@@ -5,3 +5,6 @@ node_modules/
 *.xlsx
 *.csv
 __pycache__/
+.next/
+build/
+dist/
