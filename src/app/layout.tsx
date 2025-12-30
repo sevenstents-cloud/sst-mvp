@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { MainLayout } from '@/components/layout/MainLayout'
 
 export const metadata: Metadata = {
   title: 'SST Platform',
@@ -16,7 +17,9 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className="antialiased">
         <AuthProvider>
-          {children}
+          <MainLayout>
+            {children}
+          </MainLayout>
         </AuthProvider>
       </body>
     </html>

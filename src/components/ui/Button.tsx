@@ -1,18 +1,27 @@
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'outline' | 'destructive';
+    variant?: 'primary' | 'secondary' | 'outline' | 'destructive' | 'ghost';
+    size?: 'default' | 'sm' | 'lg' | 'icon';
     isLoading?: boolean;
 }
 
 export function Button({
     children,
     variant = 'primary',
+    size = 'default',
     isLoading,
     className = '',
     ...props
 }: ButtonProps) {
+    const sizeClasses = {
+        default: 'h-10 py-2 px-4',
+        sm: 'h-9 px-3 rounded-md',
+        lg: 'h-11 px-8 rounded-md',
+        icon: 'h-10 w-10',
+    };
+
     return (
         <button
-            className={`btn btn-${variant} ${isLoading ? 'opacity-70 cursor-not-allowed' : ''} ${className}`}
+            className={`btn btn-${variant} ${sizeClasses[size]} ${isLoading ? 'opacity-70 cursor-not-allowed' : ''} ${className}`}
             disabled={isLoading || props.disabled}
             {...props}
         >

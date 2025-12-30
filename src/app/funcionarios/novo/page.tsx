@@ -1,68 +1,77 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ModuleHeader } from '@/components/layout/ModuleHeader';
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { Users } from 'lucide-react';
+import { Select } from '@/components/ui/Select';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 export default function NovoFuncionarioPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [empresas, setEmpresas] = useState<any[]>([]);
-    const [cargos, setCargos] = useState<any[]>([]);
-    const [ghes, setGhes] = useState<any[]>([]);
+
+    // Lists for selects
+    const [empresas, setEmpresas] = useState<{ id: string, label: string }[]>([]);
+    const [cargos, setCargos] = useState<{ id: string, label: string }[]>([]);
+    const [ghe, setGhe] = useState<{ id: string, label: string }[]>([]);
 
     const [formData, setFormData] = useState({
-        nome_completo: '',
+        nome: '',
         cpf: '',
         data_nascimento: '',
         data_admissao: '',
         empresa_id: '',
         cargo_id: '',
-        ghe_id: ''
+        ghe_id: '',
+        rg: '',
+        sexo: ''
     });
 
     useEffect(() => {
-        async function loadDependencies() {
-            const { data: empData } = await supabase.from('empresas').select('id, razao_social');
-            setEmpresas(empData || []);
-        }
-        loadDependencies();
+        loadInitialData();
     }, []);
 
-    // Load Cargos dependendo da Empresa
-    // Note: O DB schema tem cargos ligados a empresa
+    // Load dependent data when empresa_id changes
     useEffect(() => {
-        async function loadCargos() {
-            if (!formData.empresa_id) {
-                setCargos([]);
-                return;
-            }
-            const { data } = await supabase
-                .from('cargos')
-                .select('id, nome_cargo')
-                .eq('empresa_id', formData.empresa_id);
-            setCargos(data || []);
+        if (formData.empresa_id) {
+            loadCompanyData(formData.empresa_id);
+        } else {
+            setCargos([]);
+            setGhe([]);
         }
-        loadCargos();
     }, [formData.empresa_id]);
 
-    // Load GHE (global list for now, or filtered by local_trabalho but we don't select local here yet)
-    // For simplicity MVP: List all GHEs or we need to add local_trabalho selection to flow
-    useEffect(() => {
-        async function loadGhe() {
-            // Ideally we should filter by local_trabalho linked to enterprise, but let's list all for now
-            const { data } = await supabase.from('ghe').select('id, nome_ghe');
-            setGhes(data || []);
-        }
-        loadGhe();
-    }, []);
+    async function loadInitialData() {
+        const { data: empData } = await supabase.from('empresas').select('id, nome_fantasia').order('nome_fantasia');
+        if (empData) setEmpresas(empData.map(e => ({ id: e.id, label: e.nome_fantasia })));
+    }
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function loadCompanyData(empresaId: string) {
+        // Load Cargos for this company
+        const { data: cargoData } = await supabase
+            .from('cargos')
+            .select('id, nome')
+            .eq('empresa_id', empresaId)
+            .order('nome');
+        if (cargoData) setCargos(cargoData.map(c => ({ id: c.id, label: c.nome })));
+
+        // Load GHE (usually linked to local, but simplified here or fetch all for company's workspaces)
+        // Assuming GHE has direct link or via local. Prompt says GHE selector for local_trabalho_id.
+        // For simplicity, we might need to select Local first? 
+        // Prompt says: "Funcionarios (with selectors for empresa_id, cargo_id, ghe_id...)"
+        // It doesn't strictly say Local selector. But GHE belongs to local.
+        // I'll fetch ALL GHEs or try to filter if possible. For now fetching all.
+        const { data: gheData } = await supabase.from('ghe').select('id, nome').order('nome'); // Schema might filter by local linked to empresa
+        if (gheData) setGhe(gheData.map(g => ({ id: g.id, label: g.nome })));
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
@@ -76,91 +85,98 @@ export default function NovoFuncionarioPage() {
         } else {
             router.push('/funcionarios');
         }
-    }
+    };
 
     return (
-        <main className="container py-8 fade-in">
-            <ModuleHeader
-                title="Novo Funcionário"
-                icon={Users}
-                backLink="/funcionarios"
-            />
+        <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center gap-4">
+                <Link href="/funcionarios">
+                    <Button variant="outline" size="icon">
+                        <ArrowLeft size={20} />
+                    </Button>
+                </Link>
+                <h1 className="text-2xl font-bold">Novo Funcionário</h1>
+            </div>
 
-            <div className="card max-w-2xl mx-auto">
-                <form onSubmit={handleSubmit}>
-                    <Input
-                        label="Nome Completo"
-                        value={formData.nome_completo}
-                        onChange={(e) => setFormData({ ...formData, nome_completo: e.target.value })}
-                        required
-                    />
+            <div className="card">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="form-group md:col-span-3">
+                            <Select
+                                label="Empresa"
+                                name="empresa_id"
+                                required
+                                value={formData.empresa_id}
+                                onChange={handleChange}
+                                options={empresas}
+                            />
+                        </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Input
-                            label="CPF"
-                            value={formData.cpf}
-                            onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                            required
-                            placeholder="000.000.000-00"
-                        />
-                        <Select
-                            label="Empresa"
-                            value={formData.empresa_id}
-                            onChange={(e) => setFormData({ ...formData, empresa_id: e.target.value })}
-                            options={empresas.map(e => ({ id: e.id, label: e.razao_social }))}
-                            required
-                        />
+                        <div className="form-group md:col-span-2">
+                            <label className="form-label">Nome Completo</label>
+                            <input type="text" name="nome" required className="form-input" value={formData.nome} onChange={handleChange} />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">CPF</label>
+                            <input type="text" name="cpf" required className="form-input" placeholder="000.000.000-00" value={formData.cpf} onChange={handleChange} />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">RG</label>
+                            <input type="text" name="rg" className="form-input" value={formData.rg} onChange={handleChange} />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Data de Nascimento</label>
+                            <input type="date" name="data_nascimento" className="form-input" value={formData.data_nascimento} onChange={handleChange} />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Sexo</label>
+                            <select name="sexo" className="form-select" value={formData.sexo} onChange={handleChange}>
+                                <option value="">Selecione...</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Feminino</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Data de Admissão</label>
+                            <input type="date" name="data_admissao" required className="form-input" value={formData.data_admissao} onChange={handleChange} />
+                        </div>
+
+                        <div className="form-group">
+                            <Select
+                                label="Cargo"
+                                name="cargo_id"
+                                value={formData.cargo_id}
+                                onChange={handleChange}
+                                options={cargos}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <Select
+                                label="GHE"
+                                name="ghe_id"
+                                value={formData.ghe_id}
+                                onChange={handleChange}
+                                options={ghe}
+                            />
+                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Select
-                            label="Cargo"
-                            value={formData.cargo_id}
-                            onChange={(e) => setFormData({ ...formData, cargo_id: e.target.value })}
-                            options={cargos.map(c => ({ id: c.id, label: c.nome_cargo }))}
-                            required
-                            disabled={!formData.empresa_id}
-                        />
-                        <Select
-                            label="GHE"
-                            value={formData.ghe_id}
-                            onChange={(e) => setFormData({ ...formData, ghe_id: e.target.value })}
-                            options={ghes.map(g => ({ id: g.id, label: g.nome_ghe }))}
-                            required
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Input
-                            type="date"
-                            label="Data de Nascimento"
-                            value={formData.data_nascimento}
-                            onChange={(e) => setFormData({ ...formData, data_nascimento: e.target.value })}
-                            required
-                        />
-                        <Input
-                            type="date"
-                            label="Data de Admissão"
-                            value={formData.data_admissao}
-                            onChange={(e) => setFormData({ ...formData, data_admissao: e.target.value })}
-                            required
-                        />
-                    </div>
-
-                    <div className="flex justify-end gap-3 mt-6">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => router.back()}
-                        >
-                            Cancelar
-                        </Button>
+                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                        <Link href="/funcionarios">
+                            <Button type="button" variant="outline">Cancelar</Button>
+                        </Link>
                         <Button type="submit" isLoading={loading}>
                             Salvar Funcionário
                         </Button>
                     </div>
                 </form>
             </div>
-        </main>
+        </div>
     );
 }

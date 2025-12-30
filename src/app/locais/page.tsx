@@ -2,15 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ModuleHeader } from '@/components/layout/ModuleHeader';
 import { Table } from '@/components/ui/Table';
-import { MapPin, Pencil, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import { Plus, Eye, Edit, Trash2 } from 'lucide-react';
 
 interface LocalTrabalho {
     id: string;
-    nome_local: string;
-    empresa: { razao_social: string };
+    nome: string;
+    empresa_id: string;
+    descricao?: string;
+    empresas?: { // Joined
+        nome_fantasia: string;
+    };
 }
 
 export default function LocaisPage() {
@@ -23,20 +27,22 @@ export default function LocaisPage() {
 
     async function fetchLocais() {
         setLoading(true);
+        // Fetch locais fetching related empresa name
         const { data, error } = await supabase
             .from('locais_trabalho')
             .select(`
-        id, 
-        nome_local, 
-        empresa:empresas(razao_social)
-      `)
-            .order('nome_local');
+                *,
+                empresas (
+                    nome_fantasia
+                )
+            `)
+            .order('nome');
 
         if (error) {
-            console.error('Erro ao buscar locais:', error);
+            console.error(error);
+            alert('Erro ao carregar locais de trabalho');
         } else {
-            // @ts-ignore
-            setLocais(data || []);
+            setLocais(data as any || []);
         }
         setLoading(false);
     }
@@ -50,50 +56,52 @@ export default function LocaisPage() {
             .eq('id', id);
 
         if (error) {
-            alert('Erro ao excluir local');
+            alert('Erro ao excluir: ' + error.message);
         } else {
             fetchLocais();
         }
     }
 
     return (
-        <main className="container py-8 fade-in">
-            <ModuleHeader
-                title="Locais de Trabalho"
-                subtitle="Gerenciamento de unidades e locais"
-                icon={MapPin}
-                backLink="/"
-                actionLabel="Novo Local"
-                actionLink="/locais/novo"
-            />
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold">Locais de Trabalho</h1>
+                <Link href="/locais/novo">
+                    <Button className="gap-2">
+                        <Plus size={18} /> Novo Local
+                    </Button>
+                </Link>
+            </div>
 
             <div className="card">
                 {loading ? (
-                    <div className="p-8 text-center text-muted-foreground">Carregando...</div>
+                    <p className="text-center py-8 text-gray-500">Carregando...</p>
                 ) : (
                     <Table
                         data={locais}
                         columns={[
-                            { header: 'Local', accessorKey: 'nome_local' },
-                            { header: 'Empresa', cell: (item) => item.empresa?.razao_social || '-' },
+                            { header: 'Nome do Local', accessorKey: 'nome' },
+                            { header: 'Empresa', cell: (item) => item.empresas?.nome_fantasia || 'N/A' },
+                            { header: 'Descrição', accessorKey: 'descricao' },
                         ]}
                         actions={(item) => (
                             <>
-                                <Link href={`/locais/${item.id}`} className="btn btn-outline p-2 h-auto" title="Editar">
-                                    <Pencil size={16} />
+                                <Link href={`/locais/${item.id}`}>
+                                    <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-md">
+                                        <Eye size={18} />
+                                    </button>
                                 </Link>
                                 <button
                                     onClick={() => handleDelete(item.id)}
-                                    className="btn btn-destructive p-2 h-auto"
-                                    title="Excluir"
+                                    className="p-2 text-red-600 hover:bg-red-50 rounded-md"
                                 >
-                                    <Trash2 size={16} />
+                                    <Trash2 size={18} />
                                 </button>
                             </>
                         )}
                     />
                 )}
             </div>
-        </main>
+        </div>
     );
 }

@@ -49,8 +49,8 @@ export default function LoginPage() {
                 setStep('2FA');
                 setLoading(false);
             } else {
-                // No 2FA needed, redirect to Profile to setup
-                router.push('/perfil');
+                // No 2FA needed, redirect to Home
+                router.push('/');
             }
         }
     }

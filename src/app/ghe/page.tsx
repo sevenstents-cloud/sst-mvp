@@ -2,46 +2,39 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ModuleHeader } from '@/components/layout/ModuleHeader';
 import { Table } from '@/components/ui/Table';
-import { Users, Pencil, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import { Plus, Eye, Trash2 } from 'lucide-react';
 
 interface GHE {
     id: string;
-    nome_ghe: string;
-    codigo_ghe: string;
-    local_trabalho: { nome_local: string; empresa: { razao_social: string } };
+    nome: string;
+    descricao?: string;
+    local_trabalho_id?: string;
+    locais_trabalho?: { nome: string }; // Relation
 }
 
-export default function GhePage() {
-    const [ghes, setGhes] = useState<GHE[]>([]);
+export default function GHEPage() {
+    const [gheList, setGheList] = useState<GHE[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchGhes();
+        fetchGHE();
     }, []);
 
-    async function fetchGhes() {
+    async function fetchGHE() {
         setLoading(true);
         const { data, error } = await supabase
             .from('ghe')
-            .select(`
-        id, 
-        nome_ghe, 
-        codigo_ghe,
-        local_trabalho:locais_trabalho(
-          nome_local,
-          empresa:empresas(razao_social)
-        )
-      `)
-            .order('nome_ghe');
+            .select('*, locais_trabalho(nome)')
+            .order('nome');
 
         if (error) {
-            console.error('Erro ao buscar GHEs:', error);
+            console.error(error);
+            alert('Erro ao carregar GHEs');
         } else {
-            // @ts-ignore
-            setGhes(data || []);
+            setGheList(data as any || []);
         }
         setLoading(false);
     }
@@ -55,52 +48,52 @@ export default function GhePage() {
             .eq('id', id);
 
         if (error) {
-            alert('Erro ao excluir GHE');
+            alert('Erro ao excluir: ' + error.message);
         } else {
-            fetchGhes();
+            fetchGHE();
         }
     }
 
     return (
-        <main className="container py-8 fade-in">
-            <ModuleHeader
-                title="GHE"
-                subtitle="Grupos Homogêneos de Exposição"
-                icon={Users}
-                backLink="/"
-                actionLabel="Novo GHE"
-                actionLink="/ghe/novo"
-            />
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold">Grupos Homogêneos (GHE)</h1>
+                <Link href="/ghe/novo">
+                    <Button className="gap-2">
+                        <Plus size={18} /> Novo GHE
+                    </Button>
+                </Link>
+            </div>
 
             <div className="card">
                 {loading ? (
-                    <div className="p-8 text-center text-muted-foreground">Carregando...</div>
+                    <p className="text-center py-8 text-gray-500">Carregando...</p>
                 ) : (
                     <Table
-                        data={ghes}
+                        data={gheList}
                         columns={[
-                            { header: 'Nome GHE', accessorKey: 'nome_ghe' },
-                            { header: 'Código', accessorKey: 'codigo_ghe' },
-                            { header: 'Local', cell: (item) => item.local_trabalho?.nome_local || '-' },
-                            { header: 'Empresa', cell: (item) => item.local_trabalho?.empresa?.razao_social || '-' },
+                            { header: 'Nome', accessorKey: 'nome' },
+                            { header: 'Local de Trabalho', cell: (item) => item.locais_trabalho?.nome || '-' },
+                            { header: 'Descrição', accessorKey: 'descricao' },
                         ]}
                         actions={(item) => (
                             <>
-                                <Link href={`/ghe/${item.id}`} className="btn btn-outline p-2 h-auto" title="Editar">
-                                    <Pencil size={16} />
+                                <Link href={`/ghe/${item.id}`}>
+                                    <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-md">
+                                        <Eye size={18} />
+                                    </button>
                                 </Link>
                                 <button
                                     onClick={() => handleDelete(item.id)}
-                                    className="btn btn-destructive p-2 h-auto"
-                                    title="Excluir"
+                                    className="p-2 text-red-600 hover:bg-red-50 rounded-md"
                                 >
-                                    <Trash2 size={16} />
+                                    <Trash2 size={18} />
                                 </button>
                             </>
                         )}
                     />
                 )}
             </div>
-        </main>
+        </div>
     );
 }

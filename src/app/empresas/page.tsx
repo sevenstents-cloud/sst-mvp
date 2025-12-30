@@ -2,21 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ModuleHeader } from '@/components/layout/ModuleHeader';
 import { Table } from '@/components/ui/Table';
-import { Building2, Pencil, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/Button'; // Assuming Button component exists
 import Link from 'next/link';
+import { Plus, Eye, Edit, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Empresa {
     id: string;
-    razao_social: string;
     nome_fantasia: string;
+    razao_social: string;
     cnpj: string;
+    cidade: string;
+    estado: string;
 }
 
 export default function EmpresasPage() {
     const [empresas, setEmpresas] = useState<Empresa[]>([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         fetchEmpresas();
@@ -27,10 +31,11 @@ export default function EmpresasPage() {
         const { data, error } = await supabase
             .from('empresas')
             .select('*')
-            .order('razao_social');
+            .order('nome_fantasia');
 
         if (error) {
-            console.error('Erro ao buscar empresas:', error);
+            console.error(error);
+            alert('Erro ao carregar empresas');
         } else {
             setEmpresas(data || []);
         }
@@ -46,51 +51,59 @@ export default function EmpresasPage() {
             .eq('id', id);
 
         if (error) {
-            alert('Erro ao excluir empresa');
+            alert('Erro ao excluir: ' + error.message);
         } else {
             fetchEmpresas();
         }
     }
 
     return (
-        <main className="container py-8 fade-in">
-            <ModuleHeader
-                title="Empresas"
-                subtitle="Gerenciamento de clientes e contratantes"
-                icon={Building2}
-                backLink="/"
-                actionLabel="Nova Empresa"
-                actionLink="/empresas/novo"
-            />
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold">Empresas Clients</h1>
+                <Link href="/empresas/novo">
+                    <Button className="gap-2">
+                        <Plus size={18} /> Nova Empresa
+                    </Button>
+                </Link>
+            </div>
 
             <div className="card">
                 {loading ? (
-                    <div className="p-8 text-center text-muted-foreground">Carregando...</div>
+                    <p className="text-center py-8 text-gray-500">Carregando...</p>
                 ) : (
                     <Table
                         data={empresas}
                         columns={[
-                            { header: 'Razão Social', accessorKey: 'razao_social' },
                             { header: 'Nome Fantasia', accessorKey: 'nome_fantasia' },
+                            { header: 'Razão Social', accessorKey: 'razao_social' },
                             { header: 'CNPJ', accessorKey: 'cnpj' },
+                            { header: 'Cidade/UF', cell: (item) => `${item.cidade || ''} / ${item.estado || ''}` },
                         ]}
-                        actions={(empresa) => (
+                        actions={(item) => (
                             <>
-                                <Link href={`/empresas/${empresa.id}`} className="btn btn-outline p-2 h-auto" title="Editar">
-                                    <Pencil size={16} />
+                                <Link href={`/empresas/${item.id}`} title="Ver Detalhes">
+                                    <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-md">
+                                        <Eye size={18} />
+                                    </button>
+                                </Link>
+                                <Link href={`/empresas/${item.id}?edit=true`} title="Editar">
+                                    <button className="p-2 text-amber-600 hover:bg-amber-50 rounded-md">
+                                        <Edit size={18} />
+                                    </button>
                                 </Link>
                                 <button
-                                    onClick={() => handleDelete(empresa.id)}
-                                    className="btn btn-destructive p-2 h-auto"
+                                    onClick={() => handleDelete(item.id)}
+                                    className="p-2 text-red-600 hover:bg-red-50 rounded-md"
                                     title="Excluir"
                                 >
-                                    <Trash2 size={16} />
+                                    <Trash2 size={18} />
                                 </button>
                             </>
                         )}
                     />
                 )}
             </div>
-        </main>
+        </div>
     );
 }

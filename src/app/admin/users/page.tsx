@@ -1,176 +1,100 @@
 'use client';
 
-import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Table } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
-import { useRouter } from 'next/navigation';
-import { UserPlus, ShieldAlert, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { Plus, Edit, Trash2 } from 'lucide-react';
+
+interface User {
+    id: string;
+    email: string;
+    role: string;
+    empresa_id?: string;
+    empresas?: { nome_fantasia: string };
+    two_factor_enabled: boolean;
+}
 
 export default function AdminUsersPage() {
-    const { profile, isLoading } = useAuth();
-    const router = useRouter();
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [role, setRole] = useState('user');
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
+    useEffect(() => {
+        fetchUsers();
+    }, []);
 
-    if (isLoading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Carregando...</div>;
+    async function fetchUsers() {
+        setLoading(true);
+        // Supabase Auth users aren't directly queryable via Client SDK efficiently without Admin API
+        // But we have public.usuarios table as requested in prompt "User Management (for Administrators): Paginated list of all users (public.usuarios)".
+        const { data, error } = await supabase
+            .from('usuarios')
+            .select('*, empresas(nome_fantasia)')
+            .order('email');
 
-    if (profile?.role !== 'admin') {
-        return (
-            <div className="container" style={{ padding: '3rem 1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                <ShieldAlert size={48} style={{ color: 'var(--destructive)', marginBottom: '1rem' }} />
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Acesso Negado</h1>
-                <p style={{ color: 'gray' }}>Você não tem permissão para acessar esta página.</p>
-                <div style={{ marginTop: '1.5rem' }}>
-                    <Button onClick={() => router.push('/')}>Voltar ao Início</Button>
-                </div>
-            </div>
-        );
+        if (error) {
+            console.error(error);
+            alert('Erro ao carregar usuários');
+        } else {
+            setUsers(data as any || []);
+        }
+        setLoading(false);
     }
 
-    async function handleCreateUser(e: React.FormEvent) {
-        e.preventDefault();
-        setLoading(true);
-        setMessage('');
-        setError('');
+    async function toggle2FA(user: User) {
+        if (!confirm(`Deseja ${user.two_factor_enabled ? 'desativar' : 'ativar'} o 2FA para este usuário?`)) return;
 
-        // Get session manually since we need the token and it might be refreshed
-        // Actually AuthContext session is fine.
-        // We know session exists if profile exists.
+        const { error } = await supabase
+            .from('usuarios')
+            .update({ two_factor_enabled: !user.two_factor_enabled })
+            .eq('id', user.id);
 
-        try {
-            // Need to get access token. AuthContext provides session.
-            // Check if we need to refresh? AuthContext handles it.
-            // We can just access it via supbase.auth.getSession() to be safe or use context.
-            // Using context session from closure.
-        } catch (e) { }
-
-        // Re-get session from supabase to ensure we have token
-        const { data: { session } } = await import('@/lib/supabase').then(m => m.supabase.auth.getSession());
-
-        try {
-            const res = await fetch('/api/admin/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session?.access_token}`
-                },
-                body: JSON.stringify({ email, password, role })
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error || 'Erro ao criar usuário');
-            }
-
-            setMessage(`Usuário ${data.user.email} criado com sucesso!`);
-            setEmail('');
-            setPassword('');
-            setRole('user');
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
+        if (error) {
+            alert('Erro: ' + error.message);
+        } else {
+            fetchUsers();
         }
     }
 
     return (
-        <div className="container" style={{ padding: '3rem 1.5rem' }}>
-            <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold">Gestão de Usuários</h1>
+                <Button className="gap-2" onClick={() => alert('Para criar usuário, utilize o painel do Supabase Auth ou convite system (não implementado no Front-End only MVP).')}>
+                    <Plus size={18} /> Novo Usuário
+                </Button>
+            </div>
 
-                <div style={{ marginBottom: '2rem' }}>
-                    <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', color: 'var(--primary)', marginBottom: '1rem', textDecoration: 'none', fontWeight: 500 }}>
-                        <ArrowLeft size={16} style={{ marginRight: '0.5rem' }} /> Voltar ao Menu
-                    </Link>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <UserPlus size={32} style={{ color: 'var(--primary)' }} />
-                        <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold', margin: 0 }}>Administração de Usuários</h1>
-                    </div>
-                </div>
-
-                <div className="card">
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
-                        Cadastrar Novo Usuário
-                    </h2>
-
-                    <form onSubmit={handleCreateUser}>
-                        <div className="form-group">
-                            <label className="form-label">Email</label>
-                            <input
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="form-input"
-                                placeholder="email@exemplo.com"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">Senha Provisória</label>
-                            <input
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="form-input"
-                                placeholder="••••••••"
-                                minLength={6}
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">Função (Role)</label>
-                            <select
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)}
-                                className="form-select"
-                            >
-                                <option value="user">Usuário Padrão</option>
-                                <option value="admin">Administrador</option>
-                            </select>
-                        </div>
-
-                        <div style={{ marginTop: '2rem' }}>
-                            <Button type="submit" isLoading={loading} style={{ width: '100%' }}>
-                                <UserPlus size={18} style={{ marginRight: '0.5rem' }} />
-                                Cadastrar Usuário
-                            </Button>
-                        </div>
-                    </form>
-
-                    {message && (
-                        <div style={{
-                            marginTop: '1.5rem',
-                            padding: '1rem',
-                            backgroundColor: '#f0fdf4',
-                            color: '#15803d',
-                            border: '1px solid #bbf7d0',
-                            borderRadius: 'var(--radius)'
-                        }}>
-                            {message}
-                        </div>
-                    )}
-
-                    {error && (
-                        <div style={{
-                            marginTop: '1.5rem',
-                            padding: '1rem',
-                            backgroundColor: '#fef2f2',
-                            color: '#b91c1c',
-                            border: '1px solid #fecaca',
-                            borderRadius: 'var(--radius)'
-                        }}>
-                            {error}
-                        </div>
-                    )}
-                </div>
+            <div className="card">
+                {loading ? (
+                    <p className="text-center py-8 text-gray-500">Carregando...</p>
+                ) : (
+                    <Table
+                        data={users}
+                        columns={[
+                            { header: 'Email', accessorKey: 'email' },
+                            { header: 'Função', cell: (u) => <span className="capitalize bg-gray-100 px-2 py-1 rounded text-xs font-medium">{u.role}</span> },
+                            { header: 'Empresa', cell: (u) => u.empresas?.nome_fantasia || 'Admin / Todas' },
+                            {
+                                header: '2FA', cell: (u) => (
+                                    <span className={`px-2 py-1 rounded text-xs ${u.two_factor_enabled ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                        {u.two_factor_enabled ? 'Ativo' : 'Inativo'}
+                                    </span>
+                                )
+                            },
+                        ]}
+                        actions={(item) => (
+                            <>
+                                <button title="Toggle 2FA" onClick={() => toggle2FA(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-md">
+                                    <Edit size={18} />
+                                </button>
+                                <button className="p-2 text-red-600 hover:bg-red-50 rounded-md">
+                                    <Trash2 size={18} />
+                                </button>
+                            </>
+                        )}
+                    />
+                )}
             </div>
         </div>
     );

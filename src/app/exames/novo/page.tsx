@@ -1,23 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ModuleHeader } from '@/components/layout/ModuleHeader';
-import { Input } from '@/components/ui/Input';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { Stethoscope } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 export default function NovoExamePage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
-        nome_exame: '',
-        cod_esocial: ''
+        nome: '',
+        codigo_tuss: '',
+        natureza: ''
     });
 
-    async function handleSubmit(e: React.FormEvent) {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
@@ -31,47 +35,66 @@ export default function NovoExamePage() {
         } else {
             router.push('/exames');
         }
-    }
+    };
 
     return (
-        <main className="container py-8 fade-in">
-            <ModuleHeader
-                title="Novo Exame"
-                icon={Stethoscope}
-                backLink="/exames"
-            />
+        <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center gap-4">
+                <Link href="/exames">
+                    <Button variant="outline" size="icon">
+                        <ArrowLeft size={20} />
+                    </Button>
+                </Link>
+                <h1 className="text-2xl font-bold">Novo Exame</h1>
+            </div>
 
-            <div className="card max-w-2xl mx-auto">
-                <form onSubmit={handleSubmit}>
-                    <Input
-                        label="Nome do Exame"
-                        value={formData.nome_exame}
-                        onChange={(e) => setFormData({ ...formData, nome_exame: e.target.value })}
-                        required
-                        placeholder="Ex: Audiometria Tonal"
-                    />
+            <div className="card">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="form-group">
+                        <label className="form-label">Nome do Exame</label>
+                        <input
+                            type="text"
+                            name="nome"
+                            required
+                            className="form-input"
+                            value={formData.nome}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="form-group">
+                            <label className="form-label">Código TUSS (Opcional)</label>
+                            <input
+                                type="text"
+                                name="codigo_tuss"
+                                className="form-input"
+                                value={formData.codigo_tuss}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Natureza</label>
+                            <input
+                                type="text"
+                                name="natureza"
+                                className="form-input"
+                                placeholder="Ex: Clínico, Laboratorial"
+                                value={formData.natureza}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
 
-                    <Input
-                        label="Código eSocial"
-                        value={formData.cod_esocial}
-                        onChange={(e) => setFormData({ ...formData, cod_esocial: e.target.value })}
-                        placeholder="Ex: 0201"
-                    />
-
-                    <div className="flex justify-end gap-3 mt-6">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => router.back()}
-                        >
-                            Cancelar
-                        </Button>
+                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                        <Link href="/exames">
+                            <Button type="button" variant="outline">Cancelar</Button>
+                        </Link>
                         <Button type="submit" isLoading={loading}>
                             Salvar Exame
                         </Button>
                     </div>
                 </form>
             </div>
-        </main>
+        </div>
     );
 }

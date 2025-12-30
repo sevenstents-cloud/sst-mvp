@@ -2,16 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ModuleHeader } from '@/components/layout/ModuleHeader';
 import { Table } from '@/components/ui/Table';
-import { Briefcase, Pencil, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import { Plus, Eye, Trash2 } from 'lucide-react';
 
 interface Cargo {
     id: string;
-    nome_cargo: string;
-    cbo: string;
-    empresa: { razao_social: string };
+    nome: string;
+    cbo?: string;
+    empresa_id: string;
+    empresas?: { nome_fantasia: string };
 }
 
 export default function CargosPage() {
@@ -27,18 +28,16 @@ export default function CargosPage() {
         const { data, error } = await supabase
             .from('cargos')
             .select(`
-        id, 
-        nome_cargo, 
-        cbo,
-        empresa:empresas(razao_social)
-      `)
-            .order('nome_cargo');
+                *,
+                empresas (nome_fantasia)
+            `)
+            .order('nome');
 
         if (error) {
-            console.error('Erro ao buscar cargos:', error);
+            console.error(error);
+            alert('Erro ao carregar cargos');
         } else {
-            // @ts-ignore
-            setCargos(data || []);
+            setCargos(data as any || []);
         }
         setLoading(false);
     }
@@ -52,51 +51,52 @@ export default function CargosPage() {
             .eq('id', id);
 
         if (error) {
-            alert('Erro ao excluir cargo');
+            alert('Erro ao excluir: ' + error.message);
         } else {
             fetchCargos();
         }
     }
 
     return (
-        <main className="container py-8 fade-in">
-            <ModuleHeader
-                title="Cargos"
-                subtitle="Gerenciamento de cargos e funções"
-                icon={Briefcase}
-                backLink="/"
-                actionLabel="Novo Cargo"
-                actionLink="/cargos/novo"
-            />
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold">Cargos e Funções</h1>
+                <Link href="/cargos/novo">
+                    <Button className="gap-2">
+                        <Plus size={18} /> Novo Cargo
+                    </Button>
+                </Link>
+            </div>
 
             <div className="card">
                 {loading ? (
-                    <div className="p-8 text-center text-muted-foreground">Carregando...</div>
+                    <p className="text-center py-8 text-gray-500">Carregando...</p>
                 ) : (
                     <Table
                         data={cargos}
                         columns={[
-                            { header: 'Cargo', accessorKey: 'nome_cargo' },
+                            { header: 'Nome do Cargo', accessorKey: 'nome' },
                             { header: 'CBO', accessorKey: 'cbo' },
-                            { header: 'Empresa', cell: (item) => item.empresa?.razao_social || '-' },
+                            { header: 'Empresa', cell: (item) => item.empresas?.nome_fantasia || '-' },
                         ]}
                         actions={(item) => (
                             <>
-                                <Link href={`/cargos/${item.id}`} className="btn btn-outline p-2 h-auto" title="Editar">
-                                    <Pencil size={16} />
+                                <Link href={`/cargos/${item.id}`}>
+                                    <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-md">
+                                        <Eye size={18} />
+                                    </button>
                                 </Link>
                                 <button
                                     onClick={() => handleDelete(item.id)}
-                                    className="btn btn-destructive p-2 h-auto"
-                                    title="Excluir"
+                                    className="p-2 text-red-600 hover:bg-red-50 rounded-md"
                                 >
-                                    <Trash2 size={16} />
+                                    <Trash2 size={18} />
                                 </button>
                             </>
                         )}
                     />
                 )}
             </div>
-        </main>
+        </div>
     );
 }

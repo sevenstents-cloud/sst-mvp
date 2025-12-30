@@ -1,113 +1,118 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ModuleHeader } from '@/components/layout/ModuleHeader';
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { Briefcase } from 'lucide-react';
+import { ArrowLeft, Save, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 
-export default function EditarCargoPage({ params }: { params: Promise<{ id: string }> }) {
+export default function DetalheCargoPage() {
+    const params = useParams();
     const router = useRouter();
-    const { id } = use(params);
-    const [loading, setLoading] = useState(false);
-    const [fetching, setFetching] = useState(true);
-    const [empresas, setEmpresas] = useState<any[]>([]);
+    const id = params.id as string;
+
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
 
     const [formData, setFormData] = useState({
-        nome_cargo: '',
+        nome: '',
         cbo: '',
+        descricao: '',
         empresa_id: ''
     });
 
+    // Also need empresa name for display if read-only, but assume we just edit everything?
+    // Let's just do basics.
+
     useEffect(() => {
-        async function loadData() {
-            const { data: empData } = await supabase.from('empresas').select('id, razao_social');
-            setEmpresas(empData || []);
+        if (id) fetchCargo();
+    }, [id]);
 
-            const { data: cargoData, error } = await supabase
-                .from('cargos')
-                .select('*')
-                .eq('id', id)
-                .single();
-
-            if (error) {
-                alert('Cargo não encontrado');
-                router.push('/cargos');
-            } else {
-                setFormData(cargoData);
-                setFetching(false);
-            }
-        }
-        loadData();
-    }, [id, router]);
-
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    async function fetchCargo() {
         setLoading(true);
+        const { data, error } = await supabase
+            .from('cargos')
+            .select('*')
+            .eq('id', id)
+            .single();
 
+        if (error) {
+            console.error(error);
+            alert('Erro ao carregar cargo');
+        } else {
+            setFormData(data);
+        }
+        setLoading(false);
+    }
+
+    async function handleSave(e: React.FormEvent) {
+        e.preventDefault();
+        setSaving(true);
         const { error } = await supabase
             .from('cargos')
             .update(formData)
             .eq('id', id);
 
         if (error) {
-            alert('Erro ao atualizar cargo: ' + error.message);
-            setLoading(false);
+            alert('Erro ao salvar: ' + error.message);
         } else {
-            router.push('/cargos');
+            alert('Salvo com sucesso!');
         }
+        setSaving(false);
     }
 
-    if (fetching) return <div className="container py-8">Carregando...</div>;
+    if (loading) return <div>Carregando...</div>;
 
     return (
-        <main className="container py-8 fade-in">
-            <ModuleHeader
-                title="Editar Cargo"
-                icon={Briefcase}
-                backLink="/cargos"
-            />
+        <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center gap-4">
+                <Link href="/cargos">
+                    <Button variant="outline" size="icon">
+                        <ArrowLeft size={20} />
+                    </Button>
+                </Link>
+                <h1 className="text-2xl font-bold">Editar Cargo</h1>
+            </div>
 
-            <div className="card max-w-2xl mx-auto">
-                <form onSubmit={handleSubmit}>
-                    <Input
-                        label="Nome do Cargo"
-                        value={formData.nome_cargo}
-                        onChange={(e) => setFormData({ ...formData, nome_cargo: e.target.value })}
-                        required
-                    />
-
-                    <Input
-                        label="CBO"
-                        value={formData.cbo || ''}
-                        onChange={(e) => setFormData({ ...formData, cbo: e.target.value })}
-                    />
-
-                    <Select
-                        label="Empresa"
-                        value={formData.empresa_id}
-                        onChange={(e) => setFormData({ ...formData, empresa_id: e.target.value })}
-                        options={empresas.map(e => ({ id: e.id, label: e.razao_social }))}
-                        required
-                    />
-
-                    <div className="flex justify-end gap-3 mt-6">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => router.back()}
-                        >
-                            Cancelar
-                        </Button>
-                        <Button type="submit" isLoading={loading}>
-                            Salvar Alterações
+            <div className="card">
+                <form onSubmit={handleSave} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="form-group">
+                            <label className="form-label">Nome do Cargo</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={formData.nome}
+                                onChange={e => setFormData({ ...formData, nome: e.target.value })}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">CBO</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={formData.cbo}
+                                onChange={e => setFormData({ ...formData, cbo: e.target.value })}
+                            />
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">Descrição</label>
+                        <textarea
+                            className="form-textarea"
+                            rows={4}
+                            value={formData.descricao}
+                            onChange={e => setFormData({ ...formData, descricao: e.target.value })}
+                        />
+                    </div>
+                    <div className="flex justify-end pt-4">
+                        <Button type="submit" isLoading={saving} className="gap-2">
+                            <Save size={18} /> Salvar
                         </Button>
                     </div>
                 </form>
             </div>
-        </main>
+        </div>
     );
 }

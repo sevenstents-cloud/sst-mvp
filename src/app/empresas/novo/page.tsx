@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ModuleHeader } from '@/components/layout/ModuleHeader';
-import { Input } from '@/components/ui/Input';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { Building2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 export default function NovaEmpresaPage() {
     const router = useRouter();
@@ -14,10 +13,17 @@ export default function NovaEmpresaPage() {
     const [formData, setFormData] = useState({
         razao_social: '',
         nome_fantasia: '',
-        cnpj: ''
+        cnpj: '',
+        endereco: '',
+        cidade: '',
+        estado: ''
     });
 
-    async function handleSubmit(e: React.FormEvent) {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
@@ -31,55 +37,100 @@ export default function NovaEmpresaPage() {
         } else {
             router.push('/empresas');
         }
-    }
+    };
 
     return (
-        <main className="container py-8 fade-in">
-            <ModuleHeader
-                title="Nova Empresa"
-                icon={Building2}
-                backLink="/empresas"
-            />
+        <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center gap-4">
+                <Link href="/empresas">
+                    <Button variant="outline" size="icon">
+                        <ArrowLeft size={20} />
+                    </Button>
+                </Link>
+                <h1 className="text-2xl font-bold">Nova Empresa</h1>
+            </div>
 
-            <div className="card max-w-2xl mx-auto">
-                <form onSubmit={handleSubmit}>
-                    <Input
-                        label="Razão Social"
-                        value={formData.razao_social}
-                        onChange={(e) => setFormData({ ...formData, razao_social: e.target.value })}
-                        required
-                        placeholder="Ex: Minha Empresa LTDA"
-                    />
+            <div className="card">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="form-group">
+                            <label className="form-label">Razão Social</label>
+                            <input
+                                type="text"
+                                name="razao_social"
+                                required
+                                className="form-input"
+                                value={formData.razao_social}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Nome Fantasia</label>
+                            <input
+                                type="text"
+                                name="nome_fantasia"
+                                required
+                                className="form-input"
+                                value={formData.nome_fantasia}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">CNPJ</label>
+                            <input
+                                type="text"
+                                name="cnpj"
+                                required
+                                className="form-input"
+                                placeholder="00.000.000/0000-00"
+                                value={formData.cnpj}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Endereço</label>
+                            <input
+                                type="text"
+                                name="endereco"
+                                className="form-input"
+                                value={formData.endereco}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Cidade</label>
+                            <input
+                                type="text"
+                                name="cidade"
+                                className="form-input"
+                                value={formData.cidade}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Estado</label>
+                            <input
+                                type="text"
+                                name="estado"
+                                className="form-input"
+                                maxLength={2}
+                                placeholder="UF"
+                                value={formData.estado}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
 
-                    <Input
-                        label="Nome Fantasia"
-                        value={formData.nome_fantasia}
-                        onChange={(e) => setFormData({ ...formData, nome_fantasia: e.target.value })}
-                        placeholder="Ex: Minha Empresa"
-                    />
-
-                    <Input
-                        label="CNPJ"
-                        value={formData.cnpj}
-                        onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })}
-                        required
-                        placeholder="00.000.000/0000-00"
-                    />
-
-                    <div className="flex justify-end gap-3 mt-6">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => router.back()}
-                        >
-                            Cancelar
-                        </Button>
+                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                        <Link href="/empresas">
+                            <Button type="button" variant="outline">Cancelar</Button>
+                        </Link>
                         <Button type="submit" isLoading={loading}>
                             Salvar Empresa
                         </Button>
                     </div>
                 </form>
             </div>
-        </main>
+        </div>
     );
 }
